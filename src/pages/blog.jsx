@@ -6,27 +6,33 @@ import { graphql } from "gatsby";
 const BlogPage = ({ data }) => {
   return (
     <Layout pageTitle="My blog Posts">
-      <ul>
-        {data.allFile.edges.map((element) => (
-          <li key={element.node.name}>{element.node.name}</li>
-        ))}
-      </ul>
+      {data.allMdx.edges.map((edge) => (
+        <article key={edge.id}>
+          <h2>{edge.node.frontmatter.title}</h2>
+          <p>Posted: {edge.node.frontmatter.date}</p>
+          <p>{edge.node.excerpt}</p>
+        </article>
+      ))}
     </Layout>
   );
 };
 
-export const Head = () => <Seo title="My Blog Posts" />;
-
 export const query = graphql`
   query {
-    allFile(filter: { extension: { in: ["md", "mdx"] } }) {
+    allMdx(sort: { frontmatter: { date: DESC } }) {
       edges {
         node {
-          name
+          frontmatter {
+            date(formatString: "MMMM D,YYYY")
+            title
+          }
+          id
+          excerpt
         }
       }
     }
   }
 `;
 
+export const Head = () => <Seo title="My Blog Posts" />;
 export default BlogPage;
